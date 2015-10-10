@@ -37,7 +37,7 @@
     <string name="home_crest_content_description">Team image</string>
     <string name="away_crest_content_description">Team image</string>
 
-    <string name="api_key">1a19bd88d2be4c038f4a41ddc161d831</string>
+    <string name="api_key">Your api key goes here</string>
     <string name="share_button_text">Share</string>
     <string name="no_scores">No scores found.</string>
     <string name="refresh">Refresh</string>
