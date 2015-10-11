@@ -191,8 +191,8 @@ public class myFetchService extends IntentService
                 League = match_data.getJSONObject(LINKS).getJSONObject(SOCCER_SEASON).
                         getString("href");
                 League = League.replace(SEASON_LINK,"");
-                String leagueName = Utilies.getLeague(Integer.parseInt(League));
-                if(!leagueName.equals(Utilies.NO_LEAGUE))
+                String leagueName = Utilies.getLeague(mContext, Integer.parseInt(League));
+                if(!leagueName.equals(mContext.getString(R.string.no_known_league)))
                 {
                     match_id = match_data.getJSONObject(LINKS).getJSONObject(SELF).
                             getString("href");

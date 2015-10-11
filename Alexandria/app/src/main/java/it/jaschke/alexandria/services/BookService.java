@@ -72,7 +72,7 @@ public class BookService extends IntentService {
             writeBackCategories(book.getEan(),book.getCategories());
         }
 
-        sendMessage("Book saved!");
+        sendMessage(MainActivity.ACTION_SHOW_MESSAGE, getString(R.string.book_saved), null);
     }
 
     /**
@@ -82,12 +82,15 @@ public class BookService extends IntentService {
     private void deleteBook(String ean) {
         if(ean!=null) {
             getContentResolver().delete(AlexandriaContract.BookEntry.buildBookUri(Long.parseLong(ean)), null, null);
+            sendMessage(MainActivity.ACTION_BOOK_DELETED, null, null);
         }
     }
 
-    private void sendMessage(String message){
-        Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-        messageIntent.putExtra(MainActivity.MESSAGE_KEY, message);
+    private void sendMessage(String action, String message, Book bookFetched){
+        Intent messageIntent = new Intent();
+        messageIntent.setAction(action);
+        messageIntent.putExtra(MainActivity.EXTRA_MESSAGE, message);
+        messageIntent.putExtra(MainActivity.EXTRA_BOOK, bookFetched);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
     }
 
@@ -111,7 +114,7 @@ public class BookService extends IntentService {
 
         if(bookEntry.getCount()>0){
             bookEntry.close();
-            sendMessage("This book is already on your list!");
+            sendMessage(MainActivity.ACTION_SHOW_MESSAGE, getString(R.string.book_exists), null);
             return;
         }
 
@@ -183,7 +186,7 @@ public class BookService extends IntentService {
         final String IMG_URL = "thumbnail";
 
         if(bookJsonString == null || bookJsonString.isEmpty()){
-            sendMessage(getResources().getString(R.string.no_json));
+            sendMessage(MainActivity.ACTION_SHOW_MESSAGE, getResources().getString(R.string.no_json), null);
             return;
         }
 
@@ -193,7 +196,7 @@ public class BookService extends IntentService {
             if(bookJson.has(ITEMS)){
                 bookArray = bookJson.getJSONArray(ITEMS);
             }else{
-                sendMessage(getResources().getString(R.string.not_found));
+                sendMessage(MainActivity.ACTION_SHOW_MESSAGE, getResources().getString(R.string.not_found), null);
                 return;
             }
 
@@ -228,9 +231,7 @@ public class BookService extends IntentService {
                 }
             }
 
-            Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-            messageIntent.putExtra(MainActivity.MESSAGE_KEY, book);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+            sendMessage(MainActivity.ACTION_BOOK_FETCHED, null, book);
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error ", e);

@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import it.jaschke.alexandria.R;
+
 
 /*
  * Copyright 2009 ZXing authors
@@ -114,11 +116,10 @@ public class IntentIntegrator {
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
     private static final String TAG = IntentIntegrator.class.getSimpleName();
 
-    public static final String DEFAULT_TITLE = "Install Barcode Scanner?";
-    public static final String DEFAULT_MESSAGE =
-            "This application requires Barcode Scanner. Would you like to install it?";
-    public static final String DEFAULT_YES = "Yes";
-    public static final String DEFAULT_NO = "No";
+    public static String DEFAULT_TITLE;
+    public static String DEFAULT_MESSAGE;
+    public static String DEFAULT_YES;
+    public static String DEFAULT_NO;
 
     private static final String BS_PACKAGE = "com.google.zxing.client.android";
     private static final String BSPLUS_PACKAGE = "com.srowen.bs.android";
@@ -172,10 +173,10 @@ public class IntentIntegrator {
     }
 
     private void initializeConfiguration() {
-        title = DEFAULT_TITLE;
-        message = DEFAULT_MESSAGE;
-        buttonYes = DEFAULT_YES;
-        buttonNo = DEFAULT_NO;
+        title = activity.getString(R.string.prompt_barcode_scanner_install_title);;
+        message = activity.getString(R.string.prompt_barcode_scanner_install_message);
+        buttonYes = activity.getString(R.string.yes);
+        buttonNo = activity.getString(R.string.no);
         targetApplications = TARGET_ALL_KNOWN;
     }
 

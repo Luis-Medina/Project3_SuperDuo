@@ -33,10 +33,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
      */
     private CharSequence title;
     public static boolean IS_TABLET = false;
-    private BroadcastReceiver messageReciever;
+    private BroadcastReceiver messageReceiver;
 
-    public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
-    public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+    public static final String ACTION_SHOW_MESSAGE = "ACTION_SHOW_MESSAGE";
+    public static final String ACTION_BOOK_FETCHED = "ACTION_BOOK_FETCHED";
+    public static final String ACTION_BOOK_DELETED = "ACTION_BOOK_DELETED";
+    public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
+    public static final String EXTRA_BOOK = "EXTRA_BOOK";
 
     public static final String LIST_FRAGMENT_TAG = "list";
     public static final String ADD_FRAGMENT_TAG = "add";
@@ -52,10 +55,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             setContentView(R.layout.activity_main);
         }
 
-        messageReciever = new MessageReciever();
-        IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever,filter);
-
         navigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         title = getTitle();
@@ -63,6 +62,23 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         // Set up the drawer.
         navigationDrawerFragment.setUp(R.id.navigation_drawer,
                     (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        messageReceiver = new MessageReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_SHOW_MESSAGE);
+        filter.addAction(ACTION_BOOK_DELETED);
+        filter.addAction(ACTION_BOOK_FETCHED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
     }
 
     @Override
@@ -137,7 +153,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     @Override
     protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReciever);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
         super.onDestroy();
     }
 
@@ -160,15 +176,24 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     }
 
-    private class MessageReciever extends BroadcastReceiver {
+    private class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getStringExtra(MESSAGE_KEY)!=null){
-                Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
-            }else if(intent.getSerializableExtra(MESSAGE_KEY) != null){
-                Fragment fragment = getSupportFragmentManager().findFragmentByTag(ADD_FRAGMENT_TAG);
+            if(intent.getAction().equals(ACTION_SHOW_MESSAGE)){
+                if(intent.getStringExtra(EXTRA_MESSAGE) != null){
+                    Toast.makeText(MainActivity.this, intent.getStringExtra(EXTRA_MESSAGE), Toast.LENGTH_LONG).show();
+                }
+            }else if(intent.getAction().equals(ACTION_BOOK_FETCHED)){
+                if(intent.getSerializableExtra(EXTRA_BOOK) != null){
+                    Fragment fragment = getSupportFragmentManager().findFragmentByTag(ADD_FRAGMENT_TAG);
+                    if(fragment != null){
+                        ((AddBook)fragment).setUIWithBook((Book) intent.getSerializableExtra(EXTRA_BOOK));
+                    }
+                }
+            }else if(intent.getAction().equals(ACTION_BOOK_DELETED)){
+                Fragment fragment = getSupportFragmentManager().findFragmentByTag(LIST_FRAGMENT_TAG);
                 if(fragment != null){
-                    ((AddBook)fragment).setUIWithBook((Book) intent.getSerializableExtra(MESSAGE_KEY));
+                    ((ListOfBooks)fragment).restartLoader();
                 }
             }
         }

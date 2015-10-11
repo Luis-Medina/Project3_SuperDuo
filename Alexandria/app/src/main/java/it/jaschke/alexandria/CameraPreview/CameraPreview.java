@@ -20,6 +20,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private Camera.PreviewCallback previewCallback;
     private Camera.AutoFocusCallback autoFocusCallback;
+    private static final String LOG_TAG = CameraPreview.class.getSimpleName();
 
     public CameraPreview(Context context, Camera camera,
                          Camera.PreviewCallback previewCb,
@@ -58,7 +59,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(holder);
         } catch (IOException e) {
-            Log.d("DBG", "Error setting camera preview: " + e.getMessage());
+            Log.d(LOG_TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
@@ -92,7 +93,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
             mCamera.autoFocus(autoFocusCallback);
         } catch (Exception e){
-            Log.d("DBG", "Error starting camera preview: " + e.getMessage());
+            Log.d(LOG_TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
 }
